@@ -1,0 +1,113 @@
+---
+title: "sampleScript"
+author: "Krista Longnecker"
+date: "2026-06-17"
+output: html_document
+---
+
+```{r startClean, message=FALSE, warning=FALSE}
+
+# Clean up the environment
+rm(list = ls())
+
+# Set options to prevent automatic conversion of strings to factors
+options(stringsAsFactors = FALSE)
+
+```
+
+
+```{r load libraries, message=FALSE, warning=FALSE}
+library(data.table) # you need to install this package from CRAN
+library(dplyr)
+library(readr) #this is part of the tidyverse package
+library(here) #install this (once, install.packages("here))
+library(lubridate) #great for handling date data
+library(zoo) #for interpolations
+library(oce) #for integrations (package that will do oceanographic calculations)
+library(ggplot2)
+
+library(reshape2)
+library(MBA)
+library(mgcv)
+library(marmap)
+library(FNN)
+
+```
+
+
+```{r readInData, message=FALSE, warning=FALSE}
+
+# Load in the sample data file
+file.path <- 'sampleData.csv'
+data <- read.csv(file.path, header = TRUE)
+
+```
+
+``` {r tidyData}
+
+#Need Id : cruise / cast / niskin that get parsed out here and used later
+i <- which(colnames(data)=='BATS_id')
+colnames(data)[i] <- 'Id'
+
+# Replace -999 values with NA and extract month and year
+data[data == -999] <- NA
+data$month <- month(ymd(data$yyyymmdd))
+data$year <- year(ymd(data$yyyymmdd))
+
+# Extract cruise, cast, and bottle IDs: need this to match the MATLAB 
+# derived variables (mixed layer depths and seasons)
+data <- data %>%
+  mutate(
+    cruise = substr(Id, 1, 5),
+    cast = as.integer(substr(Id, 6, 8)),
+    bottle = as.integer(substr(Id, 9, 10)))
+
+
+```
+
+
+``` {r sourceCode}
+
+source("makeSynoptic_script_v1.R")
+
+```
+
+
+```{r useFunction, warning=FALSE}
+# Split data into separate cruises and create synoptic profiles
+useDepthLine <- 250   #what depth (m) do you want to use to split shallow versus deep casts?
+oneVariable <- 'TOC'  #what variable do you want to get additional information about?
+
+# Divide up the list and get the average values for each cruise
+result.list <- lapply(split(data, data$cruise), synoptic.func, useDepthLine, oneVariable)
+
+# Combine the results into one data.table
+result <- rbindlist(result.list, fill = TRUE)
+
+# Correct the month column to ensure whole numbers
+result$month <- as.numeric(substr(result$yyyymmdd, 5, 6))
+
+# Clean up unnecessary objects
+rm(result.list, data, synoptic.func)
+
+```
+
+
+```{r exportResult}
+
+#make the columns into characters - the cast column is a list, which makes exporting a bit messy
+write.table(apply(result,2,as.character),file = "exportResult.csv", sep = ",", row.names = FALSE)
+
+
+```
+
+
+# ``` {r makeTest, eval = FALSE}
+# 
+# fName <- "BATS_CTDdata_2db.2025.04.11.csv"
+# df <- read.csv(fName, header = TRUE)
+# raw <- df[1:8855,]
+# write.csv(raw,"sampleData.csv",row.names = FALSE)
+# 
+# ```
+

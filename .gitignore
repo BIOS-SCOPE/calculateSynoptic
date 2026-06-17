@@ -1,5 +1,7 @@
 #KL editing .gitignore to leave data files on local computer
 RawData/
+#for now, the function is not synced to GitHub
+makeSynoptic_script_v1.R
 
 # History files
 .Rhistory
