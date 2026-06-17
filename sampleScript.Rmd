@@ -5,6 +5,8 @@ date: "2026-06-17"
 output: html_document
 ---
 
+Set up a sample script so people can see how the code works.
+
 ```{r startClean, message=FALSE, warning=FALSE}
 
 # Clean up the environment
@@ -17,20 +19,22 @@ options(stringsAsFactors = FALSE)
 
 
 ```{r load libraries, message=FALSE, warning=FALSE}
+# commented out libraries not in use here, but may be useful for related work
 library(data.table) # you need to install this package from CRAN
 library(dplyr)
-library(readr) #this is part of the tidyverse package
-library(here) #install this (once, install.packages("here))
 library(lubridate) #great for handling date data
-library(zoo) #for interpolations
-library(oce) #for integrations (package that will do oceanographic calculations)
-library(ggplot2)
+#library(here) #install this (once, install.packages("here))
+#library(readr) #this is part of the tidyverse package
+#library(reshape2)
+#library(ggplot2)
 
-library(reshape2)
-library(MBA)
-library(mgcv)
-library(marmap)
-library(FNN)
+#library(zoo) #for interpolations
+#library(MBA) #spline interpolation
+#library(mgcv) #GAM models
+#library(FNN) #nearest neighbor searching
+
+#library(marmap) #for bathymetry
+#library(oce) #for integrations (package that will do oceanographic calculations)
 
 ```
 
@@ -102,12 +106,13 @@ write.table(apply(result,2,as.character),file = "exportResult.csv", sep = ",", r
 ```
 
 
-# ``` {r makeTest, eval = FALSE}
-# 
-# fName <- "BATS_CTDdata_2db.2025.04.11.csv"
-# df <- read.csv(fName, header = TRUE)
-# raw <- df[1:8855,]
-# write.csv(raw,"sampleData.csv",row.names = FALSE)
-# 
-# ```
+``` {r makeTest, eval = FALSE}
+#Used this to make the sample dataset, no need to rerun this (so eval = FALSE)
+
+fName <- "BATS_CTDdata_2db.2025.04.11.csv"
+df <- read.csv(fName, header = TRUE)
+raw <- df[1:8855,]
+write.csv(raw,"sampleData.csv",row.names = FALSE)
+ 
+```
 
