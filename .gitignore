@@ -1,6 +1,6 @@
 #KL using .gitignore to leave data files on local computer
 RawData/
-makeSynoptic_script_v1.R
+#makeSynoptic_script_v1.R
 
 # History files
 .Rhistory
